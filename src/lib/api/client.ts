@@ -1,8 +1,33 @@
 import { toApiError } from './errors';
+import { auth } from '../auth.svelte';
 
 export interface ApiFetchOptions extends RequestInit {
-	/** Raw API key; omit for anonymous calls. */
+	/** Raw API key; omit to use the signed-in key (if any). */
 	apiKey?: string;
+}
+
+function resolveKey(explicit?: string): string | undefined {
+	return explicit ?? (auth.signedIn ? auth.apiKey : undefined);
+}
+
+async function doFetch(path: string, options: ApiFetchOptions): Promise<Response> {
+	const { apiKey, headers, ...init } = options;
+	const key = resolveKey(apiKey);
+	const res = await fetch(path, {
+		...init,
+		headers: {
+			Accept: 'application/json',
+			...(init.body ? { 'Content-Type': 'application/json' } : {}),
+			...(key ? { 'X-API-Key': key } : {}),
+			...headers
+		}
+	});
+	// A key the API no longer accepts is dropped immediately so the rest of
+	// the app falls back to the anonymous view instead of erroring forever.
+	if (res.status === 401 && key === auth.apiKey && auth.signedIn) {
+		auth.signOut();
+	}
+	return res;
 }
 
 /**
@@ -11,16 +36,7 @@ export interface ApiFetchOptions extends RequestInit {
  * TypeError from fetch (callers treat them as "unreachable").
  */
 export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): Promise<T> {
-	const { apiKey, headers, ...init } = options;
-	const res = await fetch(path, {
-		...init,
-		headers: {
-			Accept: 'application/json',
-			...(init.body ? { 'Content-Type': 'application/json' } : {}),
-			...(apiKey ? { 'X-API-Key': apiKey } : {}),
-			...headers
-		}
-	});
+	const res = await doFetch(path, options);
 	if (!res.ok) {
 		throw await toApiError(res);
 	}
@@ -32,16 +48,7 @@ export async function apiFetchWithHeaders<T>(
 	path: string,
 	options: ApiFetchOptions = {}
 ): Promise<{ data: T; rateLimitRemaining?: number }> {
-	const { apiKey, headers, ...init } = options;
-	const res = await fetch(path, {
-		...init,
-		headers: {
-			Accept: 'application/json',
-			...(init.body ? { 'Content-Type': 'application/json' } : {}),
-			...(apiKey ? { 'X-API-Key': apiKey } : {}),
-			...headers
-		}
-	});
+	const res = await doFetch(path, options);
 	if (!res.ok) {
 		throw await toApiError(res);
 	}

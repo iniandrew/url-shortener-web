@@ -1,6 +1,7 @@
 <script lang="ts">
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
+	import { auth } from '$lib/auth.svelte';
 
 	let { children } = $props();
 </script>
@@ -30,6 +31,24 @@
 				>
 					Links
 				</a>
+				<span class="mx-2 h-5 w-px bg-zinc-200 dark:bg-zinc-700" aria-hidden="true"></span>
+				{#if auth.signedIn}
+					<span
+						class="hidden max-w-40 truncate rounded-lg bg-brand-50 px-2.5 py-1 font-mono text-xs text-brand-700 sm:inline-block dark:bg-brand-950 dark:text-brand-300"
+						title="API key: {auth.keyName}"
+					>
+						{auth.keyName || 'key #' + '?'}
+					</span>
+					<button
+						type="button"
+						class="rounded-lg px-3 py-1.5 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+						onclick={() => auth.signOut()}
+					>
+						Sign out
+					</button>
+				{:else}
+					<a href="/signin" class="btn-primary px-3! py-1.5!">Sign in</a>
+				{/if}
 			</nav>
 		</div>
 	</header>
