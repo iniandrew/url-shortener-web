@@ -1,6 +1,6 @@
 # url-shortener-web
 
-Web app for [url-shortener](github.com/iniandrew/url-shortener), the Go API.
+Web app for [url-shortener](https://github.com/iniandrew/url-shortener), the Go API.
 SvelteKit 2 SPA (Svelte 5 runes, adapter-static) with Tailwind CSS v4;
 TypeScript strict.
 
