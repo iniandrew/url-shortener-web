@@ -5,6 +5,7 @@
 	import { history } from '$lib/history.svelte';
 	import { validateAlias, validateUrl } from '$lib/validate';
 	import CopyButton from '$lib/components/CopyButton.svelte';
+	import QrButton from '$lib/components/QrButton.svelte';
 
 	let url = $state('');
 	let urlInput = $state<HTMLInputElement | undefined>(undefined);
@@ -257,6 +258,7 @@
 				>
 					Open
 				</a>
+				<QrButton value={result.short_url} class="btn-ghost py-1.5!" />
 			</div>
 			<p
 				class="mt-3 truncate font-mono text-xs text-zinc-500 dark:text-zinc-400"

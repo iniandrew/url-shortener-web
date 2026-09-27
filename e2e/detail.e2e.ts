@@ -32,11 +32,22 @@ test.describe('link detail + stats', () => {
 		await expect(page.getByRole('heading', { name: `/${code}` })).toBeVisible();
 		await expect(page.getByText('Destination').locator('..').getByRole('link')).toBeVisible();
 
-		// The API worker flushes counters every ~10 s; poll for the total.
-		const totalSpan = page.locator('p:has-text("total") span').first();
+		// The API worker flushes counters every ~10 s. Poll the API until the
+		// clicks land, then reload the page — it has no live refresh by design.
 		await expect
-			.poll(async () => await totalSpan.textContent(), { timeout: 30_000, intervals: [2_000] })
-			.toBe('6');
+			.poll(
+				async () => {
+					const s = await request.get(`http://localhost:8080/api/v1/links/${code}/stats`, {
+						headers: { 'X-API-Key': apiKey as string }
+					});
+					return ((await s.json()) as { total: number }).total;
+				},
+				{ timeout: 30_000, intervals: [2_000] }
+			)
+			.toBe(6);
+		await page.reload();
+		const totalSpan = page.locator('p:has-text("total") span').first();
+		await expect(totalSpan).toHaveText('6');
 
 		// Range presets change the query and stay green.
 		await page.getByRole('button', { name: '7d' }).click();

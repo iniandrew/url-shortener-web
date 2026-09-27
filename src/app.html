@@ -3,7 +3,18 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="text-scale" content="scale" />
+		<script>
+			// Apply the theme before first paint (no flash of the wrong scheme).
+			try {
+				var pref = localStorage.getItem('shortener.theme');
+				var dark = pref
+					? pref === 'dark'
+					: window.matchMedia('(prefers-color-scheme: dark)').matches;
+				if (dark) document.documentElement.classList.add('dark');
+			} catch (e) {
+				/* storage unavailable — light default */
+			}
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

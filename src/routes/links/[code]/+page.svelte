@@ -7,6 +7,7 @@
 	import BarChart from '$lib/components/BarChart.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import CopyButton from '$lib/components/CopyButton.svelte';
+	import QrButton from '$lib/components/QrButton.svelte';
 	import StatusBadge from '$lib/components/StatusBadge.svelte';
 	import { RANGE_PRESETS } from '$lib/stats';
 	import type { PageData } from './$types';
@@ -123,6 +124,7 @@
 							{data.link.short_url}
 						</a>
 						<CopyButton value={data.link.short_url} class="btn-ghost px-2! py-1!" label="Copy" />
+						<QrButton value={data.link.short_url} class="btn-ghost px-2! py-1!" />
 					</dd>
 				</div>
 				<div>
