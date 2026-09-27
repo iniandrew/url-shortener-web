@@ -1,12 +1,14 @@
 # url-shortener-web
 
-Web app for [url-shortener](../url-shortener) — the Go API. SvelteKit 2 SPA
-(Svelte 5 runes, adapter-static) with Tailwind CSS v4; TypeScript strict.
+Web app for [url-shortener](github.com/iniandrew/url-shortener), the Go API.
+SvelteKit 2 SPA (Svelte 5 runes, adapter-static) with Tailwind CSS v4;
+TypeScript strict.
 
-Served same-origin under `/app` behind the API's Caddy/Gateway, so the browser
-only ever talks to one origin (`/api/v1/...` proxied in dev, routed in prod).
-`/app` is three characters — below the 4-char minimum of a short code — so no
-app route can collide with the backend's `GET /{code}` redirect catch-all.
+Served same-origin under `/app` behind the API's Caddy/Gateway, so the
+browser only ever talks to one origin (`/api/v1/...` is proxied in dev and
+routed in prod). `/app` is three characters, below the 4-char minimum of a
+short code, so no app route can collide with the backend's `GET /{code}`
+redirect catch-all.
 
 ## Develop
 
@@ -27,19 +29,17 @@ pnpm test:e2e       # playwright (installs browsers on first run)
 pnpm build          # static bundle → build/
 ```
 
-Bundle budget: ≤ 150 KB gzipped JS (currently 60.6 KB; `node
-scripts/bundle-size.mjs` after a build). The stats chart is hand-rolled CSS
-on purpose — no chart library.
+Bundle budget: ≤ 150 KB gzipped JS (currently 60.6 KB; run `node
+scripts/bundle-size.mjs` after a build). The stats chart is hand-rolled
+CSS; there is no chart library.
 
 ## Deploy
 
-One image: multi-stage build → `caddy:2-alpine` serving the static bundle
-under `/app` (prefix is three characters, below the 4-char minimum of a
-short code, so it can never collide with the API's `GET /{code}`
-catch-all). Caddy strips the prefix (`handle_path`), falls back to
-`index.html` for every app route, and sends the CSP with a script hash for
-the inline pre-paint theme script (`node scripts/csp-hash.mjs` after
-touching it).
+One image: a multi-stage build ends at `caddy:2-alpine` serving the static
+bundle under `/app` (three characters again, so it never matches a short
+code). Caddy strips the prefix (`handle_path`), falls back to `index.html`
+for every app route, and sends the CSP with a script hash for the inline
+pre-paint theme script (`node scripts/csp-hash.mjs` after touching it).
 
 ```bash
 docker build -t url-shortener-web:dev .
@@ -62,7 +62,7 @@ redir / /app/ 308
 ```
 
 Kubernetes: `deploy/k8s/web.yaml` (Deployment 2× + Service; Caddyfile baked
-into the image) and `deploy/k8s/httproute-web.yaml` — a PathPrefix `/app`
+into the image) and `deploy/k8s/httproute-web.yaml`, a PathPrefix `/app`
 rule on the existing `public` Gateway. CI builds and pushes
 `ghcr.io/<owner>/url-shortener-web:<sha>` on merges to main (set
 `GHCR_OWNER` repo variable). Roll out web before API changes; the route is
