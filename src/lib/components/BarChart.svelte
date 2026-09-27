@@ -22,19 +22,23 @@
 	role="img"
 	aria-label="{label}: {total} clicks across {days.length} days, peak {max} on the busiest day"
 >
-	<div class="flex h-40 items-end gap-px" aria-hidden="true">
+	<!-- Instrument readout: sharp bars on a hairline baseline, no gradients. -->
+	<div
+		class="flex h-36 items-end gap-px border-b border-hairline dark:border-hairline-dark"
+		aria-hidden="true"
+	>
 		{#each days as d (d.day)}
 			<div
-				class="flex-1 rounded-t-sm transition-[height] {d.clicks > 0
-					? 'bg-brand-500/80 hover:bg-brand-400'
-					: 'bg-zinc-200 dark:bg-zinc-800'}"
+				class="flex-1 {d.clicks > 0
+					? 'bg-signal hover:bg-signal-deep'
+					: 'bg-hairline dark:bg-hairline-dark'}"
 				style="height: {d.clicks > 0 ? Math.max(4, (d.clicks / max) * 100) : 2}%"
 				title="{d.day}: {d.clicks} clicks"
 			></div>
 		{/each}
 	</div>
 	<div
-		class="mt-1 flex justify-between text-[10px] text-zinc-400 dark:text-zinc-500"
+		class="mt-1 flex justify-between font-mono text-[10px] text-ink-faint dark:text-ash-faint"
 		aria-hidden="true"
 	>
 		{#each ticks as t (t)}

@@ -1,33 +1,54 @@
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource/ibm-plex-mono/600.css';
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
 @import 'tailwindcss';
 
 /* Class-based dark mode: a `.dark` class on <html>, toggled by the theme
    controller and seeded from prefers-color-scheme. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+  Design language: "instrument panel" — an ink-on-paper terminal tool.
+
+  Everything is square, hairline-bordered and mono-set; warmth comes from
+  paper (not gray) and a single signal color. No soft shadows, no rounded
+  corners, no gradients. Interactive elements get a hard 2px offset shadow
+  on hover — a physical key press, not a glow.
+*/
 @theme {
-	--font-sans:
-		ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-	--font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+	--font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+	--font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-	/* Brand accent: violet-anchored, readable on both surfaces. */
-	--color-brand-50: oklch(0.972 0.016 295);
-	--color-brand-100: oklch(0.945 0.032 295);
-	--color-brand-200: oklch(0.897 0.062 295);
-	--color-brand-300: oklch(0.821 0.112 295);
-	--color-brand-400: oklch(0.714 0.174 295);
-	--color-brand-500: oklch(0.626 0.214 295);
-	--color-brand-600: oklch(0.549 0.216 295);
-	--color-brand-700: oklch(0.487 0.192 295);
-	--color-brand-800: oklch(0.431 0.159 295);
-	--color-brand-900: oklch(0.383 0.123 295);
-	--color-brand-950: oklch(0.283 0.091 295);
+	/* Ink and paper — warm, not gray. */
+	--color-paper: oklch(0.977 0.006 95);
+	--color-paper-deep: oklch(0.955 0.007 95);
+	--color-ink: oklch(0.21 0.006 95);
+	--color-ink-soft: oklch(0.34 0.006 95);
+	--color-ink-faint: oklch(0.55 0.005 95);
+	--color-hairline: oklch(0.885 0.006 95);
 
-	/* Status hues used by link badges and feedback states. */
-	--color-ok-500: oklch(0.72 0.17 162);
-	--color-warn-500: oklch(0.79 0.16 70);
-	--color-danger-500: oklch(0.63 0.22 25);
+	/* Terminal dark. */
+	--color-coal: oklch(0.17 0.004 95);
+	--color-coal-deep: oklch(0.145 0.004 95);
+	--color-ash: oklch(0.72 0.004 95);
+	--color-ash-faint: oklch(0.5 0.004 95);
+	--color-hairline-dark: oklch(0.28 0.004 95);
 
-	--radius-card: 0.75rem;
+	/* One signal. Used for: primary action, focus, live states.
+	   Kept dark enough for AA contrast as both text on paper and as a
+	   background under white. */
+	--color-signal: oklch(0.55 0.18 42);
+	--color-signal-deep: oklch(0.48 0.16 42);
+	--color-signal-faint: oklch(0.94 0.04 42);
+
+	/* Status — kept desaturated so signal stays the only loud color. */
+	--color-ok: oklch(0.55 0.11 150);
+	--color-warn: oklch(0.68 0.11 75);
+	--color-danger: oklch(0.52 0.16 30);
+
+	--tracking-micro: 0.14em;
 }
 
 @layer base {
@@ -42,35 +63,102 @@
 	}
 
 	body {
-		@apply bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100;
+		@apply bg-paper text-ink dark:bg-coal dark:text-paper;
 	}
 
-	/* Visible focus for keyboard users on every interactive element. */
-	:focus-visible {
-		@apply outline-2 outline-offset-2 outline-brand-500;
+	/* The app is a tool; numbers and codes never reflow their digits. */
+	:where(input, table, .tabular) {
+		font-variant-numeric: tabular-nums;
 	}
+
+	:focus-visible {
+		@apply outline-2 outline-offset-2 outline-signal;
+	}
+
+	::selection {
+		@apply bg-signal text-white;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.01ms !important;
+			animation-iteration-count: 1 !important;
+		}
+	}
+}
+
+/* ————— Utilities ————— */
+
+/* Panel: the workhorse surface. Hairline border, square, no shadow. */
+@utility panel {
+	@apply border border-hairline bg-white dark:border-hairline-dark dark:bg-coal-deep;
 }
 
 @utility card {
-	@apply rounded-(--radius-card) border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900;
+	@apply panel;
 }
 
+/* Buttons: square, mono, uppercase micro-labels. Hover = 2px hard offset
+   (a key press). Disabled keys don't move. */
 @utility btn {
-	@apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50;
+	@apply inline-flex items-center justify-center gap-2 border px-4 py-2 font-mono text-xs font-medium tracking-micro uppercase transition-[translate,box-shadow] disabled:pointer-events-none disabled:opacity-40;
 }
 
 @utility btn-primary {
-	@apply btn bg-brand-600 text-white hover:bg-brand-500 dark:bg-brand-500 dark:hover:bg-brand-400;
+	@apply btn border-signal bg-signal text-white hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[2px_2px_0_0_var(--color-ink)] dark:hover:shadow-[2px_2px_0_0_var(--color-paper)];
 }
 
 @utility btn-ghost {
-	@apply btn border border-zinc-300 bg-transparent hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800;
+	@apply btn border-hairline bg-transparent text-ink-soft hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[2px_2px_0_0_var(--color-hairline)] dark:border-hairline-dark dark:text-ash dark:hover:shadow-[2px_2px_0_0_var(--color-hairline-dark)];
 }
 
+@utility btn-danger {
+	@apply btn border-danger text-danger hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[2px_2px_0_0_var(--color-danger)];
+}
+
+/* Fields: underline-style entries, mono. The caret is the affordance. */
 @utility field {
-	@apply w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm placeholder:text-zinc-400 focus:border-brand-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900;
+	@apply w-full border border-hairline bg-white px-3 py-2 font-mono text-sm text-ink caret-signal placeholder:text-ink-faint focus:border-ink focus:outline-none dark:border-hairline-dark dark:bg-coal-deep dark:text-paper dark:placeholder:text-ash-faint dark:focus:border-ash;
 }
 
+/* Micro-caps label: "LONG URL". */
 @utility label-text {
-	@apply mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300;
+	@apply mb-1 block font-mono text-[11px] font-medium tracking-micro text-ink-faint uppercase dark:text-ash-faint;
+}
+
+/* Square status tag. */
+@utility tag {
+	@apply inline-flex items-center gap-1.5 border px-1.5 py-px font-mono text-[10px] font-medium tracking-micro uppercase;
+}
+
+@utility tag-ok {
+	@apply tag border-ok/50 text-ok;
+}
+
+@utility tag-warn {
+	@apply tag border-warn/50 text-warn;
+}
+
+@utility tag-muted {
+	@apply tag border-hairline text-ink-faint dark:border-hairline-dark dark:text-ash-faint;
+}
+
+@utility tag-signal {
+	@apply tag border-signal/50 text-signal;
+}
+
+/* Dashed rule, receipt style. */
+@utility rule-dashed {
+	@apply border-t border-dashed border-hairline dark:border-hairline-dark;
+}
+
+@utility kbd {
+	@apply inline-flex h-5 min-w-5 items-center justify-center border border-hairline bg-white px-1 font-mono text-[10px] text-ink-faint dark:border-hairline-dark dark:bg-coal-deep dark:text-ash-faint;
+}
+
+/* Blinking block cursor for the logotype and command prompt. */
+@utility cursor-block {
+	@apply inline-block h-[1em] w-[0.55em] translate-y-[0.15em] bg-signal motion-safe:animate-pulse;
 }

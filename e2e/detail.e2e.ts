@@ -52,7 +52,7 @@ test.describe('link detail + stats', () => {
 		// Range presets change the query and stay green.
 		await page.getByRole('button', { name: '7d' }).click();
 		await expect(page).toHaveURL(new RegExp(`range=7`));
-		await expect(page.getByText('avg / day')).toBeVisible();
+		await expect(page.getByText('avg/day')).toBeVisible();
 
 		// The bar chart rendered with an accessible summary.
 		await expect(page.getByRole('img', { name: new RegExp(`Clicks for /${code}`) })).toBeVisible();

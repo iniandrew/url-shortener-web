@@ -10,25 +10,20 @@
 		expired: 'expired',
 		deactivated: 'deactivated'
 	};
+
+	const dot = {
+		active: 'bg-ok',
+		expired: 'bg-warn',
+		deactivated: 'bg-ink-faint dark:bg-ash-faint'
+	} as const;
 </script>
 
-<span class="flex items-center gap-1.5">
-	<span
-		class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
-			{status === 'active'
-			? 'bg-ok-500/15 text-ok-500'
-			: status === 'expired'
-				? 'bg-warn-500/15 text-warn-500'
-				: 'bg-zinc-200 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'}"
-	>
+<span class="flex flex-wrap items-center gap-1.5">
+	<span class={status === 'active' ? 'tag-ok' : status === 'expired' ? 'tag-warn' : 'tag-muted'}>
+		<span class="inline-block h-1.5 w-1.5 {dot[status]}" aria-hidden="true"></span>
 		{labels[status]}
 	</span>
 	{#if custom}
-		<span
-			class="inline-flex items-center rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700 dark:bg-brand-950 dark:text-brand-300"
-			title="Custom alias"
-		>
-			custom
-		</span>
+		<span class="tag-signal" title="Custom alias">custom</span>
 	{/if}
 </span>

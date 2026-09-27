@@ -38,7 +38,7 @@ test.describe('sign-in', () => {
 		await page.getByLabel('Long URL').fill(`https://example.com/e2e/history-${alias}`);
 		await page.getByRole('button', { name: 'Advanced options' }).click();
 		await page.getByLabel('Custom alias').fill(alias);
-		await page.getByRole('button', { name: 'Shorten', exact: true }).click();
+		await page.getByRole('button', { name: /^Shorten/ }).click();
 
 		await expect(
 			page.getByRole('link', { name: new RegExp(`localhost:8080/${alias}$`) })

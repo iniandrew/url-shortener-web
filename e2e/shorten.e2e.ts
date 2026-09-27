@@ -12,7 +12,7 @@ test('shorten flow: paste, submit, result card, copy', async ({ page }) => {
 
 	const card = page.getByRole('link', { name: /localhost:8080\// });
 	await expect(card).toBeVisible({ timeout: 10_000 });
-	await expect(page.getByText(`→ ${url}`)).toBeVisible();
+	await expect(page.locator('dd a', { hasText: url })).toBeVisible();
 
 	// The API's own redirect answers 302 for the new code.
 	const short = (await card.getAttribute('href')) as string;

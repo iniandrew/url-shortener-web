@@ -16,10 +16,10 @@
 	} = $props();
 
 	let dialog = $state<HTMLDivElement | undefined>(undefined);
-	let confirmBtn = $state<HTMLButtonElement | undefined>(undefined);
+	let cancelBtn = $state<HTMLButtonElement | undefined>(undefined);
 
 	$effect(() => {
-		confirmBtn?.focus();
+		cancelBtn?.focus();
 	});
 
 	function onKeydown(event: KeyboardEvent) {
@@ -44,7 +44,7 @@
 <svelte:window onkeydown={onKeydown} />
 
 <div
-	class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/50 p-4"
+	class="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 dark:bg-coal/70"
 	role="presentation"
 	onclick={(e) => e.target === e.currentTarget && oncancel()}
 >
@@ -53,19 +53,27 @@
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby="confirm-title"
-		class="w-full max-w-sm card p-5"
+		class="w-full max-w-sm panel"
 	>
-		<h2 id="confirm-title" class="text-lg font-semibold">{title}</h2>
-		<p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{message}</p>
-		<div class="mt-5 flex justify-end gap-2">
-			<button type="button" class="btn-ghost" disabled={busy} onclick={oncancel}>Cancel</button>
+		<div class="border-b border-hairline px-4 py-2 dark:border-hairline-dark">
+			<h2 id="confirm-title" class="font-mono text-xs tracking-micro uppercase">{title}</h2>
+		</div>
+		<p class="px-4 py-4 font-mono text-xs leading-relaxed text-ink-soft dark:text-ash">
+			{message}
+		</p>
+		<div
+			class="flex justify-end gap-2 border-t border-hairline px-4 py-3 dark:border-hairline-dark"
+		>
 			<button
-				bind:this={confirmBtn}
+				bind:this={cancelBtn}
 				type="button"
-				class="btn bg-danger-500 text-white hover:opacity-90"
+				class="btn-ghost px-3! py-1.5!"
 				disabled={busy}
-				onclick={onconfirm}
+				onclick={oncancel}
 			>
+				Cancel
+			</button>
+			<button type="button" class="btn-danger px-3! py-1.5!" disabled={busy} onclick={onconfirm}>
 				{confirmLabel}
 			</button>
 		</div>

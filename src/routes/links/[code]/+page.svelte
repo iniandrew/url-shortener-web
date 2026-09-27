@@ -72,9 +72,9 @@
 </svelte:head>
 
 {#if data.notFound}
-	<section class="mx-auto mt-8 max-w-md card p-10 text-center">
-		<h1 class="text-xl font-semibold">/{data.code} is not yours</h1>
-		<p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+	<section class="mx-auto mt-8 max-w-md panel p-8 text-center">
+		<h1 class="font-mono text-lg font-semibold">/{data.code} is not yours</h1>
+		<p class="mt-2 text-sm text-ink-soft dark:text-ash">
 			It does not exist, or it belongs to another key. Anonymous links are only reachable by their
 			code.
 		</p>
@@ -84,18 +84,18 @@
 	<section>
 		<a
 			href="/links"
-			class="text-sm text-zinc-500 hover:text-zinc-800 hover:underline dark:text-zinc-400 dark:hover:text-zinc-200"
+			class="font-mono text-[11px] tracking-micro text-ink-faint uppercase hover:text-signal dark:text-ash-faint"
 		>
 			← All links
 		</a>
 
 		<div class="mt-3 flex flex-wrap items-center justify-between gap-3">
 			<div class="flex min-w-0 items-center gap-3">
-				<h1 class="font-mono text-2xl font-bold">/{data.link.code}</h1>
+				<h1 class="truncate font-mono text-2xl font-bold tracking-tight">/{data.link.code}</h1>
 				<StatusBadge status={status!} custom={data.link.is_custom} />
 			</div>
 			{#if status === 'active'}
-				<button type="button" class="btn-ghost text-danger-500" onclick={() => (pending = true)}>
+				<button type="button" class="btn-danger" onclick={() => (pending = true)}>
 					Deactivate
 				</button>
 			{/if}
@@ -103,38 +103,45 @@
 
 		{#if actionError}
 			<div
-				class="mt-4 rounded-lg border border-danger-500/40 bg-danger-500/10 px-4 py-3 text-sm"
+				class="mt-4 border border-danger/50 bg-danger/10 px-4 py-3 font-mono text-xs"
 				role="alert"
 			>
 				{actionError}
 			</div>
 		{/if}
 
-		<div class="mt-6 card p-5">
-			<dl class="grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
-				<div class="flex items-center justify-between gap-4 sm:justify-start">
-					<dt class="text-zinc-500 dark:text-zinc-400">Short URL</dt>
+		<div class="mt-6 panel">
+			<div
+				class="border-b border-hairline px-5 py-2 font-mono text-[10px] tracking-micro text-ink-faint uppercase dark:border-hairline-dark dark:text-ash-faint"
+			>
+				Record
+			</div>
+			<dl class="grid gap-x-8 gap-y-3 px-5 py-4 font-mono text-xs sm:grid-cols-2">
+				<div>
+					<dt class="label-text mb-0.5">Short URL</dt>
 					<dd class="flex items-center gap-2">
 						<a
 							href={data.link.short_url}
 							target="_blank"
 							rel="noopener noreferrer"
-							class="truncate font-mono text-brand-600 hover:underline dark:text-brand-400"
+							class="truncate text-signal hover:underline"
 						>
 							{data.link.short_url}
 						</a>
-						<CopyButton value={data.link.short_url} class="btn-ghost px-2! py-1!" label="Copy" />
-						<QrButton value={data.link.short_url} class="btn-ghost px-2! py-1!" />
 					</dd>
+					<div class="mt-1.5 flex gap-1.5">
+						<CopyButton value={data.link.short_url} class="btn-ghost px-2! py-0.5!" label="Copy" />
+						<QrButton value={data.link.short_url} class="btn-ghost px-2! py-0.5!" />
+					</div>
 				</div>
 				<div>
-					<dt class="text-zinc-500 dark:text-zinc-400">Destination</dt>
-					<dd class="mt-0.5 truncate">
+					<dt class="label-text mb-0.5">Destination</dt>
+					<dd class="min-w-0">
 						<a
 							href={data.link.long_url}
 							target="_blank"
 							rel="noopener noreferrer"
-							class="text-brand-600 hover:underline dark:text-brand-400"
+							class="block truncate text-signal hover:underline"
 							title={data.link.long_url}
 						>
 							{data.link.long_url}
@@ -142,49 +149,59 @@
 					</dd>
 				</div>
 				<div>
-					<dt class="text-zinc-500 dark:text-zinc-400">Created</dt>
-					<dd class="mt-0.5">{fmtDateTime(data.link.created_at)}</dd>
+					<dt class="label-text mb-0.5">Created</dt>
+					<dd class="text-ink-soft dark:text-ash">{fmtDateTime(data.link.created_at)}</dd>
 				</div>
 				<div>
-					<dt class="text-zinc-500 dark:text-zinc-400">Expires</dt>
-					<dd class="mt-0.5">{fmtDate(data.link.expires_at)}</dd>
+					<dt class="label-text mb-0.5">Expires</dt>
+					<dd class="text-ink-soft dark:text-ash">{fmtDate(data.link.expires_at)}</dd>
 				</div>
 			</dl>
 		</div>
 
-		<div class="mt-6 card p-5">
-			<div class="flex flex-wrap items-baseline justify-between gap-2">
-				<h2 class="font-semibold">Clicks</h2>
-				<div class="flex items-center gap-1 text-sm" role="group" aria-label="Range">
+		<div class="mt-6 panel">
+			<div
+				class="flex flex-wrap items-center justify-between gap-2 border-b border-hairline px-5 py-2 dark:border-hairline-dark"
+			>
+				<h2
+					class="font-mono text-[10px] tracking-micro text-ink-faint uppercase dark:text-ash-faint"
+				>
+					Clicks
+				</h2>
+				<div
+					class="flex items-center gap-1 font-mono text-[10px] tracking-micro uppercase"
+					role="group"
+					aria-label="Range"
+				>
 					{#each RANGE_PRESETS as preset (preset)}
 						<button
 							type="button"
-							class="rounded-lg px-2.5 py-1 {data.range.days === preset && !data.range.from
-								? 'bg-brand-600 text-white'
-								: 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800'}"
+							class="border px-2 py-0.5 {data.range.days === preset && !data.range.from
+								? 'border-signal bg-signal text-white'
+								: 'border-transparent text-ink-faint hover:border-hairline dark:text-ash-faint dark:hover:border-hairline-dark'}"
 							aria-pressed={data.range.days === preset && !data.range.from}
 							onclick={() => setPreset(preset)}
 						>
 							{preset}d
 						</button>
 					{/each}
-					<span class="mx-1 h-4 w-px bg-zinc-300 dark:bg-zinc-700" aria-hidden="true"></span>
+					<span class="mx-1 h-3 w-px bg-hairline dark:bg-hairline-dark" aria-hidden="true"></span>
 					<input
 						type="date"
-						class="field w-auto! px-2! py-1! text-xs"
+						class="field w-auto! px-1.5! py-0.5! text-[10px]"
 						bind:value={customFrom}
 						aria-label="From date"
 					/>
-					<span class="text-xs text-zinc-400">→</span>
+					<span class="text-ink-faint dark:text-ash-faint">→</span>
 					<input
 						type="date"
-						class="field w-auto! px-2! py-1! text-xs"
+						class="field w-auto! px-1.5! py-0.5! text-[10px]"
 						bind:value={customTo}
 						aria-label="To date"
 					/>
 					<button
 						type="button"
-						class="rounded-lg px-2.5 py-1 text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+						class="border border-transparent px-2 py-0.5 text-ink-faint hover:border-hairline dark:text-ash-faint dark:hover:border-hairline-dark"
 						onclick={setCustom}
 						disabled={!customFrom || !customTo || customFrom > customTo}
 					>
@@ -193,21 +210,25 @@
 				</div>
 			</div>
 
-			<div class="mt-3 flex gap-6">
+			<div class="flex gap-8 px-5 pt-4 font-mono">
 				<p>
 					<span class="text-2xl font-bold">{data.stats.total}</span>
-					<span class="ml-1 text-sm text-zinc-500 dark:text-zinc-400">total</span>
+					<span class="ml-1 text-[10px] tracking-micro text-ink-faint uppercase dark:text-ash-faint"
+						>total</span
+					>
 				</p>
 				<p>
 					<span class="text-2xl font-bold">{data.avg}</span>
-					<span class="ml-1 text-sm text-zinc-500 dark:text-zinc-400">avg / day</span>
+					<span class="ml-1 text-[10px] tracking-micro text-ink-faint uppercase dark:text-ash-faint"
+						>avg/day</span
+					>
 				</p>
 			</div>
 
-			<div class="mt-4">
+			<div class="px-5 py-4">
 				<BarChart days={data.days} label={`Clicks for /${data.link.code}`} />
 			</div>
-			<p class="mt-3 text-xs text-zinc-400 dark:text-zinc-500">
+			<p class="rule-dashed px-5 py-2.5 font-mono text-[10px] text-ink-faint dark:text-ash-faint">
 				{data.stats.from} → {data.stats.to} · fresh counts appear after the API's worker flush (≈10 s)
 			</p>
 		</div>

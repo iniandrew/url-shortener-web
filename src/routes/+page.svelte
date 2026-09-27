@@ -122,28 +122,36 @@
 	<meta name="description" content="Paste a long URL, get a short one." />
 </svelte:head>
 
-<section class="mx-auto max-w-xl">
-	<h1 class="text-center text-4xl font-bold tracking-tight sm:text-5xl">Shorten a URL</h1>
-	<p class="mt-3 text-center text-zinc-600 dark:text-zinc-400">
+<section class="max-w-2xl">
+	<h1 class="font-mono text-3xl leading-tight font-semibold tracking-tight">
+		Shorten a URL<span class="ml-1 cursor-block" aria-hidden="true"></span>
+	</h1>
+	<p class="mt-3 max-w-md text-sm text-ink-soft dark:text-ash">
 		Paste a long link, press shorten, share the short one. No account needed.
 	</p>
 
 	<form onsubmit={submit} class="mt-8" novalidate>
 		<label class="label-text" for="url">Long URL</label>
-		<div class="flex gap-2">
+		<div class="flex items-stretch gap-0">
+			<span
+				class="flex items-center border border-r-0 border-hairline bg-paper-deep px-3 font-mono text-sm text-signal select-none dark:border-hairline-dark dark:bg-coal-deep"
+				aria-hidden="true"
+			>
+				❯
+			</span>
 			<input
 				id="url"
 				type="text"
-				class="field font-mono"
+				class="field rounded-none border-x-0"
 				placeholder="https://example.com/very/long/path?utm_source=x"
 				bind:value={url}
 				bind:this={urlInput}
 				aria-invalid={urlError ? 'true' : undefined}
 				aria-describedby={urlError ? 'url-error' : undefined}
 			/>
-			<button type="submit" class="btn-primary shrink-0" disabled={!canSubmit}>
+			<button type="submit" class="btn-primary rounded-none px-5!" disabled={!canSubmit}>
 				{#if submitting}
-					<svg aria-hidden="true" class="h-4 w-4 animate-spin" viewBox="0 0 16 16" fill="none">
+					<svg aria-hidden="true" class="h-3.5 w-3.5 animate-spin" viewBox="0 0 16 16" fill="none">
 						<circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="2" opacity="0.25" />
 						<path
 							d="M14.5 8A6.5 6.5 0 0 0 8 1.5"
@@ -152,52 +160,56 @@
 							stroke-linecap="round"
 						/>
 					</svg>
-					Shortening…
+					Working
 				{:else}
-					Shorten
+					Shorten <span class="opacity-60">↵</span>
 				{/if}
 			</button>
 		</div>
 
 		{#if urlError}
-			<p id="url-error" class="mt-2 text-sm text-danger-500" role="alert">{urlError}</p>
+			<p id="url-error" class="mt-2 font-mono text-xs text-danger" role="alert">
+				{urlError}
+			</p>
 		{/if}
 
 		{#if auth.signedIn}
 			<button
 				type="button"
-				class="mt-3 text-sm text-brand-600 hover:underline dark:text-brand-400"
+				class="mt-3 font-mono text-[11px] tracking-micro text-ink-faint uppercase hover:text-signal dark:text-ash-faint dark:hover:text-signal"
 				onclick={() => (showAdvanced = !showAdvanced)}
 				aria-expanded={showAdvanced}
 			>
-				{showAdvanced ? 'Hide' : 'Advanced'} options
+				{showAdvanced ? '− Hide' : '+ Advanced'} options
 			</button>
 			{#if showAdvanced}
-				<div class="mt-3 grid gap-4 sm:grid-cols-2">
+				<div
+					class="mt-3 grid gap-4 border-l-2 border-hairline pl-4 sm:grid-cols-2 dark:border-hairline-dark"
+				>
 					<div>
 						<label class="label-text" for="alias">Custom alias</label>
 						<input
 							id="alias"
 							type="text"
-							class="field font-mono"
+							class="field"
 							placeholder="promo-okt"
 							bind:value={alias}
 							aria-invalid={aliasError ? 'true' : undefined}
 							aria-describedby={aliasError ? 'alias-error' : undefined}
 						/>
 						{#if aliasError}
-							<p id="alias-error" class="mt-1 text-sm text-danger-500" role="alert">
+							<p id="alias-error" class="mt-1 font-mono text-xs text-danger" role="alert">
 								{aliasError}
 							</p>
 						{/if}
-						<p class="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
-							4–32 characters: letters, numbers, _ or -
+						<p class="mt-1 font-mono text-[10px] text-ink-faint dark:text-ash-faint">
+							4–32 chars · [a-zA-Z0-9_-]
 						</p>
 					</div>
 					<div>
 						<label class="label-text" for="expiry">Expires</label>
 						<input id="expiry" type="date" class="field" bind:value={expiry} />
-						<p class="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+						<p class="mt-1 font-mono text-[10px] text-ink-faint dark:text-ash-faint">
 							Optional — no expiry by default
 						</p>
 					</div>
@@ -207,22 +219,16 @@
 	</form>
 
 	{#if retryAfter > 0}
-		<div
-			class="mt-4 rounded-lg border border-warn-500/40 bg-warn-500/10 px-4 py-3 text-sm text-zinc-800 dark:text-zinc-200"
-			role="alert"
-		>
-			Rate limit reached — the anonymous allowance is 10 links per hour. Try again in
-			<strong>{retryAfter}</strong>
-			s{#if !auth.signedIn}
-				(or sign in with an API key for 1,000/h){/if}.
+		<div class="mt-4 border border-warn/50 bg-warn/10 px-4 py-3 font-mono text-xs" role="alert">
+			RATE LIMIT — anonymous allowance is 10 links/hour. Retry in
+			<strong>{retryAfter}</strong>s{#if !auth.signedIn}
+				(or sign in with an API key for 1,000/h){/if}
+			.
 		</div>
 	{/if}
 
 	{#if formError}
-		<div
-			class="mt-4 rounded-lg border border-danger-500/40 bg-danger-500/10 px-4 py-3 text-sm text-zinc-800 dark:text-zinc-200"
-			role="alert"
-		>
+		<div class="mt-4 border border-danger/50 bg-danger/10 px-4 py-3 font-mono text-xs" role="alert">
 			{formError}
 			<button
 				type="button"
@@ -235,97 +241,120 @@
 	{/if}
 
 	{#if result}
-		<div class="mt-6 card p-5" aria-live="polite">
-			<p class="text-sm text-zinc-500 dark:text-zinc-400">Your short link</p>
-			<div class="mt-1 flex flex-wrap items-center gap-3">
+		<!-- Receipt: the machine's answer, printed on dashed-rule stationery. -->
+		<div class="mt-8 panel" aria-live="polite">
+			<div
+				class="flex items-center justify-between border-b border-hairline px-5 py-2 dark:border-hairline-dark"
+			>
+				<span
+					class="font-mono text-[10px] tracking-micro text-ink-faint uppercase dark:text-ash-faint"
+				>
+					Short link
+				</span>
+				<span class="font-mono text-[10px] tracking-micro text-ok uppercase"> 201 · created </span>
+			</div>
+			<div class="px-5 py-4">
 				<a
 					href={result.short_url}
 					target="_blank"
 					rel="noopener noreferrer"
-					class="font-mono text-2xl font-semibold text-brand-600 hover:underline dark:text-brand-400"
+					class="font-mono text-xl font-semibold break-all text-signal hover:underline"
 				>
 					{result.short_url}
 				</a>
-				<CopyButton
-					value={result.short_url}
-					class="btn-ghost py-1.5! text-brand-600 dark:text-brand-400"
-				/>
-				<a
-					href={result.short_url}
-					target="_blank"
-					rel="noopener noreferrer"
-					class="btn-ghost py-1.5!"
-				>
-					Open
-				</a>
-				<QrButton value={result.short_url} class="btn-ghost py-1.5!" />
+				<div class="mt-3 flex flex-wrap gap-2">
+					<CopyButton value={result.short_url} class="btn-ghost px-2.5! py-1!" />
+					<a
+						href={result.short_url}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="btn-ghost px-2.5! py-1!"
+					>
+						Open ↗
+					</a>
+					<QrButton value={result.short_url} class="btn-ghost px-2.5! py-1!" />
+				</div>
 			</div>
-			<p
-				class="mt-3 truncate font-mono text-xs text-zinc-500 dark:text-zinc-400"
-				title={result.long_url}
-			>
-				→ {result.long_url}
-			</p>
-			{#if result.expires_at}
-				<p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-					Expires {new Date(result.expires_at).toLocaleString()}
-				</p>
-			{/if}
-			{#if quota !== null}
-				<p class="mt-3 text-xs text-zinc-400 dark:text-zinc-500">
-					{#if auth.signedIn}Key allowance{:else}Anonymous allowance{/if}: {quota} links left this hour
-				</p>
-			{/if}
+			<dl class="px-5 pb-4 font-mono text-xs">
+				<div class="flex gap-3 rule-dashed py-2">
+					<dt class="w-20 shrink-0 text-ink-faint dark:text-ash-faint">DEST</dt>
+					<dd class="min-w-0 break-all text-ink-soft dark:text-ash">
+						<a
+							href={result.long_url}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="hover:text-signal hover:underline">{result.long_url}</a
+						>
+					</dd>
+				</div>
+				{#if result.expires_at}
+					<div class="flex gap-3 rule-dashed py-2">
+						<dt class="w-20 shrink-0 text-ink-faint dark:text-ash-faint">EXPIRES</dt>
+						<dd class="text-ink-soft dark:text-ash">
+							{new Date(result.expires_at).toLocaleString()}
+						</dd>
+					</div>
+				{/if}
+				{#if quota !== null}
+					<div class="flex gap-3 rule-dashed py-2">
+						<dt class="w-20 shrink-0 text-ink-faint dark:text-ash-faint">QUOTA</dt>
+						<dd class="text-ink-soft dark:text-ash">
+							{#if auth.signedIn}Key allowance{:else}Anonymous allowance{/if}: {quota} left this hour
+						</dd>
+					</div>
+				{/if}
+			</dl>
 		</div>
 	{/if}
 
 	{#if history.entries.length > 0}
 		<section class="mt-12" aria-label="Recently created in this browser">
 			<div class="flex items-baseline justify-between">
-				<h2 class="text-lg font-semibold">Recent in this browser</h2>
+				<h2
+					class="font-mono text-xs font-medium tracking-micro text-ink-faint uppercase dark:text-ash-faint"
+				>
+					Recent · this browser
+				</h2>
 				<button
 					type="button"
-					class="text-sm text-zinc-500 hover:text-zinc-800 hover:underline dark:text-zinc-400 dark:hover:text-zinc-200"
+					class="font-mono text-[10px] tracking-micro text-ink-faint uppercase hover:text-danger dark:text-ash-faint"
 					onclick={() => history.clear()}
 				>
 					Clear
 				</button>
 			</div>
-			<ul class="mt-3 divide-y divide-zinc-200 card dark:divide-zinc-800">
+			<ul class="mt-2 divide-y divide-hairline panel dark:divide-hairline-dark">
 				{#each history.entries as entry (entry.code)}
-					<li class="flex items-center gap-3 px-4 py-3">
+					<li class="flex items-center gap-3 px-4 py-2.5">
 						<div class="min-w-0 flex-1">
 							<a
 								href={entry.short_url}
 								target="_blank"
 								rel="noopener noreferrer"
-								class="font-mono text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
+								class="font-mono text-sm font-medium text-signal hover:underline"
 							>
 								/{entry.code}
 							</a>
-							<p class="truncate text-xs text-zinc-500 dark:text-zinc-400" title={entry.long_url}>
+							<p
+								class="truncate font-mono text-[11px] text-ink-faint dark:text-ash-faint"
+								title={entry.long_url}
+							>
 								{entry.long_url}
 							</p>
 						</div>
 						{#if entry.expires_at}
-							<span class="hidden shrink-0 text-xs text-zinc-400 sm:block" title="Expires">
+							<span
+								class="hidden shrink-0 font-mono text-[10px] text-ink-faint sm:block dark:text-ash-faint"
+							>
 								until {formatDate(entry.expires_at)}
 							</span>
 						{/if}
 						{#if entry.managed}
-							<span
-								class="hidden shrink-0 rounded-full bg-brand-50 px-2 py-0.5 text-xs text-brand-700 sm:inline-block dark:bg-brand-950 dark:text-brand-300"
-							>
-								managed
-							</span>
+							<span class="tag-signal hidden sm:inline-flex">managed</span>
 						{:else}
-							<span
-								class="hidden shrink-0 rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-500 sm:inline-block dark:bg-zinc-800 dark:text-zinc-400"
-							>
-								not managed
-							</span>
+							<span class="tag-muted hidden sm:inline-flex">not managed</span>
 						{/if}
-						<CopyButton value={entry.short_url} class="btn-ghost px-2! py-1!" label="Copy" />
+						<CopyButton value={entry.short_url} class="btn-ghost px-2! py-0.5!" label="Copy" />
 					</li>
 				{/each}
 			</ul>

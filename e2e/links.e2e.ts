@@ -51,6 +51,13 @@ test.describe('links dashboard', () => {
 		await expect(page.getByRole('row')).toHaveCount(4); // header + 3
 		await expect(page.getByText(/3 links matching/)).toBeVisible();
 
+		// Row links navigate within the app (base-prefixed hrefs).
+		await page.getByRole('link', { name: `/${codes[1]}`, exact: true }).click();
+		await expect(page.getByRole('heading', { name: `/${codes[1]}` })).toBeVisible();
+		await expect(page).toHaveURL(new RegExp(`/app/links/${codes[1]}`));
+		await page.goBack();
+		await page.getByLabel('Search by code or destination').fill(marker);
+
 		// Deactivate one row through the confirm dialog.
 		const victim = codes[0];
 		await page

@@ -22,7 +22,7 @@
 			await QRCode.toCanvas(canvas, value, {
 				width: 220,
 				margin: 2,
-				color: { dark: '#18181b', light: '#ffffff' }
+				color: { dark: '#1a1917', light: '#faf9f5' }
 			});
 		}
 		document.addEventListener('keydown', onKeydown);
