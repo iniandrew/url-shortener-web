@@ -1,0 +1,28 @@
+# Standalone container config: serves the SPA under /app and (optionally)
+# forwards /api to the backend. In production the edge Caddy that fronts the
+# API does this routing instead — see README "Deploy".
+#
+# The CSP allow-lists the single inline script (pre-paint theme) by hash.
+# Re-run scripts/csp-hash.mjs after touching that script.
+:8080 {
+	encode zstd gzip
+
+	redir / /app/ 308
+	redir /app /app/ 308
+
+	header Content-Security-Policy "default-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'sha256-4VHSEdMyXGTGs5Mse3adIZ03yXxNX8EkLr1eAwKQeRU='; frame-ancestors 'none'; base-uri 'self'"
+	header X-Content-Type-Options nosniff
+	header Referrer-Policy no-referrer
+
+	handle_path /app/* {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+
+	# Only useful when running standalone (e.g. docker run without the edge).
+	# Point it at the API: docker run -e API_UPSTREAM=host.docker.internal:8080 …
+	handle /api/* {
+		reverse_proxy {$API_UPSTREAM:host.docker.internal:8080}
+	}
+}
