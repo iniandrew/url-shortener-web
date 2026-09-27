@@ -12,6 +12,21 @@ node_modules
 .DS_Store
 Thumbs.db
 
+# Editors / IDEs — never track machine-local editor state
+.vscode/
+.idea/
+.history/
+.fleet/
+.zed/
+.cursor/
+.cursorrules
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
 # Env
 .env
 .env.*
