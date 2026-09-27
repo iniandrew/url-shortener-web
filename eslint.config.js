@@ -40,7 +40,10 @@ export default defineConfig(
 			// Typed routes are not enabled in this project; plain hrefs are
 			// rewritten with the /app base automatically. The rule expects a
 			// resolve() helper this SvelteKit version does not export.
-			'svelte/no-navigation-without-resolve': 'off'
+			'svelte/no-navigation-without-resolve': 'off',
+			// Same version gap: SvelteURLSearchParams is not exported by the
+			// installed @sveltejs/kit yet; these params never need reactivity.
+			'svelte/prefer-svelte-reactivity': 'off'
 		}
 	}
 );

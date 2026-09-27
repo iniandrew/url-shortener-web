@@ -1,6 +1,9 @@
 import { apiFetch, apiFetchWithHeaders } from './client';
 import { toApiError } from './errors';
 
+/** Page size used by the dashboard listing. */
+export const PAGE_SIZE = 25;
+
 export interface LinkCreated {
 	code: string;
 	short_url: string;
